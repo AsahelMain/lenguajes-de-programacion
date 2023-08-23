@@ -15,3 +15,24 @@ sus tres lados. Se usa la fórmula de Herón para calcular dicha área |#
   (let ([sp (/ (+ a b c) 2)])
   (sqrt (* sp (- sp a)(- sp b)(- sp c))))
 )
+
+#| Ejercicio 5 |#
+#| Predicado que indica si todos los números contenidos en una lista |#
+#| son pares |#
+(define (pares? lst)
+  (cond [(empty? lst) #t]
+        [else (and (even? (car lst)) (pares? (cdr lst)))]))
+
+#| Ejercicio 6 |#
+#| Función principal que filtra los elementos de una lista de acuerdo a un |#
+#| predicado |#
+(define (filtra-lista p ls)
+  (filtra-lista-aux p ls empty))
+#| Función auxiliar de filtra-lista. Filtra los elementos de una lista de acuerdo |#
+#| a un predicado. La función se usa porque recibe como parámetro un acumulador para |#
+#| así usar recursión de cola |#
+(define (filtra-lista-aux p ls acc)
+  (cond [(empty? ls) (reverse acc)]
+        [(p (car ls)) (filtra-lista-aux p (cdr ls) (cons (car ls) acc))]
+        [else (filtra-lista-aux p (cdr ls) acc)])
+  )
