@@ -1,5 +1,10 @@
 #lang plai
 
+#| Ejercicio 1 |#
+#| Funcion que calcula el area de un cono circular recto, dada su generatriz y base del cono.
+Se usa la formula dada en el pdf. |#
+(define (area-total g d) (+ (* pi (/ d 2) g) (* pi (* (/ d 2) (/ d 2)))))
+
 #| Ejercicio 2 |#
 #| Función que indica si cuatro números están ordenados
    de forma estrictamente decremental |#
@@ -7,6 +12,14 @@
   (and (> a b) (> b c) (> c d))
 )
 
+#| Ejercicio 3 |#
+#| Funcion que dada una lista multiplica todos los elementos contenidos en la misma.
+Es recursiva, multiplica la cabeza de cada cola resultante de la lista tras llamar la funcion,
+el caso devuelve un uno para terminar de multiplicar.|#
+(define (multiplica ls)
+  (cond
+    [(empty? ls) 1]
+    [else (* (car ls) (multiplica (cdr ls)))]))
 
 #| Ejercicio 4 |#
 #| Funcion principal que calcula el área de un triángulo dados
