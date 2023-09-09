@@ -3,16 +3,12 @@
 (define (any? x)
   #t)
 
-#| Ejercicio 1 |#
 (define-type Punto
   [punto (x number?) (y number?)])
 
 ;; Ejercicio 1.a)
 (define (punto-medio p q)
-  (match (list p q)
-    [(list (punto x1 y1) (punto x2 y2))
-           (punto (exact->inexact(/ (+ x1 x2) 2)) (exact->inexact(/ (+ y1 y2) 2)))]
-    [_ (error 'punto-medio "Ambos argumentos deben ser del tipo Punto")]))
+  (error 'punto-medio "Sin implementar"))
 
 ;; Ejercicio 1.b)
 (define (distancia p q)
@@ -39,16 +35,7 @@
 
 ;; Ejercicio 2.c)
 (define (intercala ls ks)
-  (cond
-    [(and (Lista? ls) (Lista? ks)) (intercala-aux ls ks)]
-    [else (error 'intercala "ambos elementos deben ser del tipo Lista")]))
-(define (intercala-aux ls ks)
-  (match (list ls ks)
-    [(list (Vacia) (Vacia)) (Vacia)]
-    [(list (Vacia) (Cons cabeza2 resto2)) ks]
-    [(list (Cons cabeza1 resto1) (Vacia)) ls]
-    [(list (Cons cabeza1 resto1) _) (Cons cabeza1 (intercala-aux ks resto1))]))
-  
+  (error 'intercala "Sin implementar"))
 
 ;; Ejercicio 2.d)
 (define (aplana ls)
