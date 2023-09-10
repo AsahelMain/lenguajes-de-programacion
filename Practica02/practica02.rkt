@@ -8,6 +8,9 @@
   [punto (x number?) (y number?)])
 
 ;; Ejercicio 1.a)
+#| Función que dados dos puntos
+   calcula el punto medio entre estos
+   punto-medio :: Punto Punto -> Punto  |#
 (define (punto-medio p q)
   (match (list p q)
     [(list (punto x1 y1) (punto x2 y2))
@@ -38,6 +41,9 @@
 
 
 ;; Ejercicio 2.c)
+#| Función que dadas dos listas intercala
+   sus elementos
+   intercala :: Lista Lista -> Lista    |#
 (define (intercala ls ks)
   (cond
     [(and (Lista? ls) (Lista? ks)) (intercala-aux ls ks)]
@@ -72,8 +78,19 @@
                   (ABB (f elemento) (mapea-arbol izq f) (mapea-arbol der f)))))
 
 ;; Ejercicio 3.c)
+#| Funcion que dado un árbol binario regresa
+   una lista con todas sus hojas
+   hojas :: ArbolBinarioDeBusqueda -> (listof any) |#
 (define (hojas ar)
-  (error 'hojas "Sin implementar"))
+  (type-case ArbolBinarioDeBusqueda ar
+    [ArbolVacio () '()]
+    [ABB (elemento izq der)
+           (cond
+             [(and (equal? izq (ArbolVacio)) (equal? der (ArbolVacio)))
+               (list elemento)]
+             [else
+               (append (hojas izq) (hojas der))])]))
+       
 
 ;; Punto Extra
 (define (mas-repetido ls)
