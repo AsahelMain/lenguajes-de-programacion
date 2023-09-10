@@ -26,18 +26,22 @@
     [Cons (cabeza any?) (resto Lista?)])
 
 ;; Ejercicio 2.a)
+#| Calcula la cantidad de elementos de una lista.
+   longitud :: Lista -> number |#
 (define (longitud ls)
   (longitud-aux 0 ls))
 (define (longitud-aux accum ls)
   (type-case Lista ls
              (Vacia () accum)
-             (Cons (_ resto) (longitud-aux (+ 1 accum) resto))))
+             (Cons (_ resto) (longitud-aux (add1 accum) resto))))
 
 ;; Ejercicio 2.b)
+#| Indica si un elemento está en una lista.
+   pertenece? :: any Lista -> boolean |#
 (define (pertenece? e ls)
   (type-case Lista ls
              (Vacia () #f)
-             (Cons (cabeza resto) (or (= cabeza e) (pertenece? e resto)))))
+             (Cons (cabeza resto) (or (equal? cabeza e) (pertenece? e resto)))))
 
 
 ;; Ejercicio 2.c)
@@ -71,6 +75,9 @@
   (error 'elimina "Sin implementar"))
 
 ;; Ejercicio 3.b)
+#| Aplica una función a todos los elementos de un árbol binario de búsqueda
+   y regresa el árbol resultado.
+   mapea-arbol :: ArbolBinarioDeBusqueda procedure ->ArbolBinarioDeBusqueda |#
 (define (mapea-arbol ab f)
   (type-case ArbolBinarioDeBusqueda ab
              (ArbolVacio () ab)
@@ -93,10 +100,13 @@
        
 
 ;; Punto Extra
+#| Regresa el primer elemento con mayor número de apariciones en una lista.
+   mas-repetido :: (listof any) ->any |#
 (define (mas-repetido ls)
   (if (empty? ls)
       (error 'ls "La lista está vacía.")
+      ;; Agrupa los elementos de la lista por sus identidades.
       (let* ((elementos-agrupados (group-by identity ls))
-             (repeticiones-elementos
-              (map (lambda (x) (list (first x) (length x))) elementos-agrupados)))
-        (first (first (sort repeticiones-elementos #:key second >))))))
+             ;; Primer lista que maximiza la función length.
+            (mas-grande-ls (argmax length elementos-agrupados)))
+        (first mas-grande-ls))))
