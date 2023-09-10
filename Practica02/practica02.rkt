@@ -107,6 +107,7 @@
       (error 'ls "La lista está vacía.")
       ;; Agrupa los elementos de la lista por sus identidades.
       (let* ((elementos-agrupados (group-by identity ls))
-             ;; Primer lista que maximiza la función length.
-            (mas-grande-ls (argmax length elementos-agrupados)))
-        (first mas-grande-ls))))
+             ;; Lista con elemento y repeticiones.
+             (repeticiones-elementos
+              (map (lambda (x) (list (first x) (length x))) elementos-agrupados)))
+        (first (first (sort repeticiones-elementos #:key second >))))))
