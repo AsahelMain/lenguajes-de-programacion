@@ -33,9 +33,14 @@
    longitud :: Lista -> number |#
 (define (longitud ls)
   (longitud-aux 0 ls))
+#| Función auxiliar de longitud para usar recursión de cola.
+   longitud-aux :: number Lista -> number |#
 (define (longitud-aux accum ls)
   (type-case Lista ls
+             ;; Si es vacía se devuelve el acumulador.
              (Vacia () accum)
+             ;; Se invoca la función sobre la cola de la lista
+             ;; e incrementando en uno el contador.
              (Cons (_ resto) (longitud-aux (add1 accum) resto))))
 
 ;; Ejercicio 2.b)
@@ -44,6 +49,8 @@
 (define (pertenece? e ls)
   (type-case Lista ls
              (Vacia () #f)
+             ;; El elemento pertenece solo si es igual a la cabeza de la lista
+             ;; o si pertenece a la cola de la lista.
              (Cons (cabeza resto) (or (equal? cabeza e) (pertenece? e resto)))))
 
 
@@ -95,6 +102,7 @@
   (type-case ArbolBinarioDeBusqueda ab
              (ArbolVacio () ab)
              (ABB (elemento izq der)
+                  ;; Se aplica la función solo sobre el elemento del árbol.
                   (ABB (f elemento) (mapea-arbol izq f) (mapea-arbol der f)))))
 
 ;; Ejercicio 3.c)
@@ -122,10 +130,12 @@
    mas-repetido :: (listof any) ->any |#
 (define (mas-repetido ls)
   (if (empty? ls)
-      (error 'ls "La lista está vacía.")
+      (error 'mas-repetido "La lista está vacía.")
       ;; Agrupa los elementos de la lista por sus identidades.
       (let* ((elementos-agrupados (group-by identity ls))
              ;; Lista con elemento y repeticiones.
              (repeticiones-elementos
               (map (lambda (x) (list (first x) (length x))) elementos-agrupados)))
+        ;; Ordena establemente la lista con la comparación > y devuelve el primer
+        ;; elemento de la primera lista.
         (first (first (sort repeticiones-elementos #:key second >))))))
