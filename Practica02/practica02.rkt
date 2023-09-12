@@ -9,7 +9,10 @@
 
 ;; Ejercicio 1.a)
 #| Función que dados dos puntos
-   calcula el punto medio entre estos
+   calcula el punto medio entre estos.
+   Simplemente se usa la fórmula para calcular
+   el punto medio entre dos puntos
+   
    punto-medio :: Punto Punto -> Punto  |#
 (define (punto-medio p q)
   (match (list p q)
@@ -46,12 +49,22 @@
 
 ;; Ejercicio 2.c)
 #| Función que dadas dos listas intercala
-   sus elementos
+   sus elementos. La función principal
+   verifica que las dos expresiones pasadas
+   como argumentos sean listas.
+   
    intercala :: Lista Lista -> Lista    |#
 (define (intercala ls ks)
   (cond
     [(and (Lista? ls) (Lista? ks)) (intercala-aux ls ks)]
     [else (error 'intercala "ambos elementos deben ser del tipo Lista")]))
+#| Función auxiliar de intercala
+   Utiliza recursión para agregar alternadamente elementos
+   de las dos listas. Para lograr esto se intercambia el
+   orden en el que se pasan las listas a la llamada recursiva.
+   
+   intercala-aux :: Lista Lista -> Lista
+|#
 (define (intercala-aux ls ks)
   (match (list ls ks)
     [(list (Vacia) (Vacia)) (Vacia)]
@@ -86,7 +99,12 @@
 
 ;; Ejercicio 3.c)
 #| Funcion que dado un árbol binario regresa
-   una lista con todas sus hojas
+   una lista con todas sus hojas.
+   Utiliza recursión, si el elemento es una hoja entonces
+   se crea una lista con ese elemento, si no es una hoja
+   entonces se hace una llamada recursiva a los subárboles
+   y las listas que resulten de esas llamadas se concatenan
+   
    hojas :: ArbolBinarioDeBusqueda -> (listof any) |#
 (define (hojas ar)
   (type-case ArbolBinarioDeBusqueda ar
