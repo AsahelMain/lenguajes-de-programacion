@@ -21,9 +21,15 @@
     [_ (error 'punto-medio "Ambos argumentos deben ser del tipo Punto")]))
 
 ;; Ejercicio 1.b)
+#| Función que dados dos puntos calcula
+   la distancia entre ambos
+   distancia :: Punto Punto -> number|#
 (define (distancia p q)
-  (error 'distancia "Sin implementar"))
+  (match (list p q)
+    [(list (punto x1 y1) (punto x2 y2)) (sqrt (+ (* (- x2 x1) (- x2 x1)) (* (- y2 y1) (- y2 y1))))]
+    [_ (error 'punto-medio "Ambos argumentos deben ser del tipo Punto")]))
 
+#| Ejercicio 2 |#
 (define-type Lista
     [Vacia]
     [Cons (cabeza any?) (resto Lista?)])
@@ -81,18 +87,30 @@
   
 
 ;; Ejercicio 2.d)
+#| Funcion que recibe una lista de elementos que pueden ser otras listas
+   y devuelve una lista que contenga a todos los elementos de la lista
+   aplana :: Lista -> Lista|#
 (define (aplana ls)
-  (error 'aplana "Sin implementar"))
+  (type-case Lista ls
+    (Vacia () (Vacia))
+    (Cons (cabeza resto) (cond
+                           [(Lista? cabeza) (concatena (aplana cabeza) (aplana resto))]
+                           [else (Cons cabeza (aplana resto))]))))
 
+#| Funcion que concatena dos listas en una sola
+   concatena :: Lista  Lista -> Lista |#
+
+(define (concatena ls ks)
+  (match (list ls ks)
+    [(list (Vacia) _) ks]
+    [(list (Cons cabeza1 resto1) _) (Cons cabeza1 (concatena resto1 ks))]))  
+
+#| Ejercicio 3 |#
 (define-type ArbolBinarioDeBusqueda
   [ArbolVacio]
   [ABB (elemento number?)
        (izq ArbolBinarioDeBusqueda?)
        (der ArbolBinarioDeBusqueda?)])
-
-;; Ejercicio 3.a)
-(define (elimina e a)
-  (error 'elimina "Sin implementar"))
 
 ;; Ejercicio 3.b)
 #| Aplica una función a todos los elementos de un árbol binario de búsqueda
@@ -114,6 +132,7 @@
    y las listas que resulten de esas llamadas se concatenan
    
    hojas :: ArbolBinarioDeBusqueda -> (listof any) |#
+
 (define (hojas ar)
   (type-case ArbolBinarioDeBusqueda ar
     [ArbolVacio () '()]
