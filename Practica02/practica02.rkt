@@ -132,10 +132,13 @@
   (if (empty? ls)
       (error 'mas-repetido "La lista está vacía.")
       ;; Agrupa los elementos de la lista por sus identidades.
+      ;; La función 'group-by preserva el orden de la lista original.
       (let* ((elementos-agrupados (group-by identity ls))
-             ;; Lista con elemento y repeticiones.
+             ;; Lista de listas donde el primer elemento de las sublistas
+             ;; es elemento de la lista original y el segundo es su número de repeticiones.
              (repeticiones-elementos
               (map (lambda (x) (list (first x) (length x))) elementos-agrupados)))
-        ;; Ordena establemente la lista con la comparación > y devuelve el primer
-        ;; elemento de la primera lista.
+        ;; Ordena establemente la lista con la comparación >, usando
+        ;; el segundo elemento de la lista como llave (el número de
+        ;; repeticiones) y devuelve el primer elemento de la primera lista.
         (first (first (sort repeticiones-elementos #:key second >))))))
