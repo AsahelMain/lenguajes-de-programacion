@@ -1,3 +1,6 @@
+#|@author{Arturo González Peñaloza 319091193}
+@author{Asahel Said Main Cerezo 319260658}
+@author{Emilio Arsenio Raudry Rico 318289276}|#
 #lang plai
 
 (define (any? x)
@@ -111,6 +114,42 @@
   [ABB (elemento number?)
        (izq ArbolBinarioDeBusqueda?)
        (der ArbolBinarioDeBusqueda?)])
+
+;; Ejercicio 3.a)
+
+#|Recibe un árbol y un elemento, devuelve el mismo árbol pero sin ese elemento.
+  Comienza ubicando al nodo con el elemento a eliminar.
+  elimina :: ArbolBinarioDeBusqueda elemento -> ArbolBinarioDeBusqueda|#
+(define (elimina ar e)
+  (type-case ArbolBinarioDeBusqueda ar
+             (ArbolVacio () ar)
+             (ABB (elemento izq der)
+                  (cond [(< e elemento) (ABB elemento izq (elimina der e))]
+                        [(> e elemento) (ABB elemento (elimina izq e) der)]
+                        [else (elimina-aux ar)]))))
+
+#|Función auxiliar de elimina. Elimina el elemento del árbol dependiendo
+  del estado de sus árboles izquierdo y derecho.
+  elimina :: ArbolBinarioDeBusqueda elemento -> ArbolBinarioDeBusqueda|#
+(define (elimina-aux ar)
+  (type-case ArbolBinarioDeBusqueda ar
+             (ArbolVacio () ar)
+             (ABB (elemento izq der)
+                  (cond
+                    [(ArbolVacio? izq) der]
+                    [(ArbolVacio? der) izq]
+                    [else (let ((sucesor (obtenMinimo izq)))
+                            (ABB (ABB-elemento sucesor) (elimina izq (ABB-elemento sucesor)) der))]))))
+
+#| Devuelve el árbol cuyo elemento es el elemento mínimo
+   obtenMinimo :: ArbolBinarioDeBusqueda -> ArbolBinarioDeBusqueda|#
+(define (obtenMinimo ar)
+  (type-case ArbolBinarioDeBusqueda ar
+             (ArbolVacio () ar)
+             (ABB (elemento _ der)
+                  (cond
+                    [(ArbolVacio? der) ar]
+                    [else (obtenMinimo der)]))))
 
 ;; Ejercicio 3.b)
 #| Aplica una función a todos los elementos de un árbol binario de búsqueda
