@@ -15,4 +15,4 @@
   (foldl (lambda (a b) (and a b)) #t args))
 
 (define (oR . args)
-  (foldl (lambda (a b) (or a b)) #t args))
+  (foldl (lambda (a b) (or a b)) #f args))
