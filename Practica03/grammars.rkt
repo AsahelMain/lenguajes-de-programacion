@@ -4,11 +4,12 @@
   [binding (id symbol?) (value WAE?)])
 
 (define-type WAE
-  [id (i symbol?)]
   [num (n number?)]
-  [with (assigns (listof Binding?)) (body WAE?)]
+  [id (i symbol?)]
   [bool (b boolean?)]
   [strinG (s string?)]
+  [op (f procedure?) (args (listof WAE?))]
+  [with (assigns (listof Binding?)) (body WAE?)]
   [with* (assigns (listof Binding?)) (body WAE?)])
 
 (define (anD . args)
