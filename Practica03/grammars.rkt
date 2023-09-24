@@ -7,7 +7,7 @@
   [num (n number?)]
   [id (i symbol?)]
   [bool (b boolean?)]
-  [strinG (s string?)]
+  [str (s string?)]
   [op (f procedure?) (args (listof WAE?))]
   [with (assigns (listof Binding?)) (body WAE?)]
   [with* (assigns (listof Binding?)) (body WAE?)])
