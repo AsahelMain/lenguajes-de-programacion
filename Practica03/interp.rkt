@@ -3,11 +3,41 @@
 (require "grammars.rkt")
 ;(require "parser.rkt")
 
-;(define (interp expr))
+(define (interp expr)
+  (type-case WAE expr
+           [id (i) (error 'interp "Variable libre")]
+           [num (n) n]
+           [bool (b) b]
+           [str (s) s]
+           [op (f args)
+               (with-handlers ([exn:fail?
+                                (lambda (exn)
+                                  (exn-message exn))])
+                 (let ([args-interpretados (map interp args)])
+                   (with-handlers ([exn:fail?
+                                    (lambda (exn)
+                                      (error 'interp  "error: violación de contrato\n~a" (exn-message exn)))])
+                     (apply f args-interpretados))   ))
+               
+               ]
+           [with (assigns body)
+                 (interp (foldl (lambda (binding acc)
+                                  (subst (binding-id binding) (binding-value binding) acc))
+                                body
+                                assigns))]
+           [with* (assigns body) (interp (with*->with expr))]))
+
+(define (with*->with expr)
+  (let ([bindings (with*-assigns expr)]
+        [body (with*-body expr)])
+    (with (list (first bindings))
+          (if (empty? (rest bindings))
+              body
+              (with*->with (with* (rest bindings) body))))))
 
 
 #|
-  subst: symbol WAE WAE -> WAE
+subst: symbol WAE WAE -> WAE
 |#
 (define (subst sub-id value expr)
     (type-case WAE expr
@@ -42,11 +72,6 @@
            [(binding? binding)
             (let ([id (binding-id binding)]
                   [val (binding-value binding)])
-              (crear-binding id (subst sub-id value val)))] 
+              (crear-binding id (subst sub-id value val)))]
            [else binding]))
        assigns))
-  
-
-
-
-      
