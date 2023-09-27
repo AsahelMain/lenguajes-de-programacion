@@ -12,9 +12,9 @@
     [(list? s-exp)
      (let [(head (car s-exp))]
        (case head
-         [(sub1 add1 not zero? num? str? bool? str-length) (if (= (length (cdr s-exp)) 1) (op head (list parse(cdr s-exp))) (error 'parse (string-append "La operacion " (symbol->string head) "espera 1 argumento. Numero de argumentos recibidos: " (number->string (length (cdr s-exp))) ".") ))]
-         [(modulo expt) (if (= (length (cdr s-exp)) 2) (op head (list (map parse(cdr s-exp)))) (error 'parse (string-append "La operacion " (symbol->string head) "espera 2 argumento. Numero de argumentos recibidos: " (number->string (length (cdr s-exp))) ".") ))]
-         [(+ - * / min max sqrt < > <= >= anD oR) (if (> (length (cdr s-exp)) 0) (op head (list (map parse(cdr s-exp)))) (error 'parse (string-append "La operacion " (symbol->string head) "espera mas de 0 argumentos. Numero de argumentos recibidos: " (number->string (length (cdr s-exp))) ".") ))]
+         [(sub1 add1 not zero? num? str? bool? str-length) (if (= (length (cdr s-exp)) 1) (op (eval head) (map parse(cdr s-exp))) (error 'parse (string-append "La operacion " (symbol->string head) "espera 1 argumento. Numero de argumentos recibidos: " (number->string (length (cdr s-exp))) ".") ))]
+         [(modulo expt) (if (= (length (cdr s-exp)) 2) (op (eval head) (map parse(cdr s-exp))) (error 'parse (string-append "La operacion " (symbol->string head) "espera 2 argumento. Numero de argumentos recibidos: " (number->string (length (cdr s-exp))) ".") ))]
+         [(+ - * / min max sqrt < > <= >= anD oR) (if (> (length (cdr s-exp)) 0) (op (eval head) (map parse(cdr s-exp))) (error 'parse (string-append "La operacion " (symbol->string head) "espera mas de 0 argumentos. Numero de argumentos recibidos: " (number->string (length (cdr s-exp))) ".") ))]
          [(with) (let [(repetido (symRepetido (flatten (second s-exp))))]
                    (case repetido
                      [(null?) (with (parse(second s-exp)) (parse(third s-exp)))]
