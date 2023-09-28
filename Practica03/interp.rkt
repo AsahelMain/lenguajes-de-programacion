@@ -55,10 +55,7 @@
                 [(estaEnBindings? sub-id assigns) (with (substBindings sub-id value assigns) body)]
                 [else (with (substBindings sub-id value assigns) (subst sub-id value body))])]
       
-        [with* (assigns body)
-              (cond
-                [(estaEnBindings? sub-id assigns) (with* (substBindings sub-id value assigns) body)]
-                [else (with* (substBindings sub-id value assigns) (subst sub-id value body))])]))
+        [with* (assigns body) (subst sub-id value (with*->with expr))]))
 
 
 #|Función auxiliar de subst
