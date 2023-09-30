@@ -63,7 +63,7 @@
 
 
 #|Función auxiliar de interp y subst que transforma una expresión WAE with* a expresiones
-  with anidadas. Se usa para simplificar los procedimiento sque involucran a with*.
+  with anidadas. Se usa para simplificar los procedimientos que involucran a with*.
 
   with*->with: WAE -> WAE
 |#
