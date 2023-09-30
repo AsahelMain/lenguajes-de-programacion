@@ -19,6 +19,7 @@ parse: WAE -> ASA|#
          [(modulo expt) (if (= (length (cdr s-exp)) 2) (op (eval head) (map parse(cdr s-exp))) (error 'parse (string-append "La operación " (symbol->string head) " debe de ser ejecutada con 2 argumentos.")))]
          [(+ - * / min max = < > <= >= and or) (if (> (length (cdr s-exp)) 0) (op (eval (translate head)) (map parse(cdr s-exp))) (error 'parse (string-append "La operación " (symbol->string head) " debe ser ejecutada con mas de 0 argumentos." )))]
          [(with) (with (bindingList (second s-exp) '()) (parse (third s-exp)))]
+         [(with*) (with* (map list-to-binding (second s-exp)) (parse (third s-exp)))]
 ))]))
 #| Función encargada de verificar que no haya
 identificadores repetidos dentro la lista de
@@ -52,4 +53,7 @@ translate: procedure -> procedure|#
 
 list-to-binding: list -> ASA|#
 (define (list-to-binding ls)
-  (binding (first ls) (parse (second ls))))
+  (case (length ls)
+    [(2) (binding (first ls) (parse (second ls)))]
+    [else error 'parse "Estructura incorrecta de Binding."]
+  ))
