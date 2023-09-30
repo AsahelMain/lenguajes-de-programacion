@@ -1,31 +1,31 @@
 #lang plai
 
 (require "grammars.rkt")
-;(require "parser.rkt")
+(require "parser.rkt")
 
 (define (interp expr)
   (type-case WAE expr
-           [id (i) (error 'interp "Variable libre")]
-           [num (n) n]
-           [bool (b) b]
-           [str (s) s]
-           [op (f args)
-               (with-handlers ([exn:fail?
-                                (lambda (exn)
-                                  (exn-message exn))])
-                 (let ([args-interpretados (map interp args)])
-                   (with-handlers ([exn:fail?
-                                    (lambda (exn)
-                                      (error 'interp  "error: violación de contrato\n~a" (exn-message exn)))])
-                     (apply f args-interpretados))   ))
-               
-               ]
-           [with (assigns body)
-                 (interp (foldl (lambda (binding acc)
-                                  (subst (binding-id binding) (binding-value binding) acc))
-                                body
-                                assigns))]
-           [with* (assigns body) (interp (with*->with expr))]))
+             [id (i) (error 'interp "Variable libre: '~a" i)]
+             [num (n) n]
+             [bool (b) b]
+             [str (s) s]
+             [op (f args)
+                 (with-handlers ([exn:fail?
+                                  (lambda (exn)
+                                    (exn-message exn))])
+                   (let ([args-interpretados (map interp args)])
+                     (with-handlers ([exn:fail?
+                                      (lambda (exn)
+                                        (error 'interp  "error: violación de contrato\n~a" (exn-message exn)))])
+                       (apply f args-interpretados))   ))
+                 
+                 ]
+             [with (assigns body)
+                   (interp (foldl (lambda (binding acc)
+                                    (subst (binding-id binding) (binding-value binding) acc))
+                                  body
+                                  assigns))]
+             [with* (assigns body) (interp (with*->with expr))]))
 
 (define (with*->with expr)
   (let ([bindings (with*-assigns expr)]
