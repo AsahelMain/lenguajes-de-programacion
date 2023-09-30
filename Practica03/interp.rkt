@@ -3,6 +3,10 @@
 (require "grammars.rkt")
 (require "parser.rkt")
 
+#| Ejercicio 4 |#
+#| Función que recibe una expresión WAE y la interpreta.
+   interp WAE -> number | boolean | string
+|#
 (define (interp expr)
   (type-case WAE expr
              [id (i) (error 'interp "Variable libre: '~a" i)]
@@ -10,23 +14,60 @@
              [bool (b) b]
              [str (s) s]
              [op (f args)
-                 (with-handlers ([exn:fail?
-                                  (lambda (exn)
-                                    (exn-message exn))])
-                   (let ([args-interpretados (map interp args)])
-                     (with-handlers ([exn:fail?
-                                      (lambda (exn)
-                                        (error 'interp  "error: violación de contrato\n~a" (exn-message exn)))])
-                       (apply f args-interpretados))   ))
-                 
-                 ]
+                 (let ([args-interpretados (map interp args)])                   
+                   ;; Se revisa que los tipos de los argumentos dados sean validos.
+                   ;; En caso de no serlo se imprime el procedimiento con el tipo de argumento
+                   ;; esperado y el recibido.
+                   ;; Se decidió manejar los errores de esta forma debido a que
+                   ;; Racket lo hace de una forma similar.
+                   (when (verifica-argumentos f args-interpretados)
+                       (apply f args-interpretados)))]
              [with (assigns body)
+                   ;; Se sustituye cada id en el cuerpo y se interpreta.
                    (interp (foldl (lambda (binding acc)
                                     (subst (binding-id binding) (binding-value binding) acc))
                                   body
                                   assigns))]
+             ;; Se interpreta la expresión transformada a withs anidados.
              [with* (assigns body) (interp (with*->with expr))]))
 
+#|Función auxiliar de interp que verifica que los argumentos dados a
+  un procedimiento sean válidos, en caso de no serlos muestra un error.
+
+  verifica-argumentos: procedure (listof any) -> boolean
+|#
+(define (verifica-argumentos f args)
+  (let ([ops-con-num '(+ - / * min max expt sqrt sub1 add1 < > <= >= = number? zero?)]
+        [ops-con-int '(modulo )]
+        [ops-con-bool '(not anD oR bool?)]
+        [ops-con-str '(string-length string?)])
+    (ormap (lambda (x) (eq? (eval x) f)) ops-con-num)
+    (cond 
+      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-num)
+       (if (andmap number? args)
+           #t
+           (error 'interp "~a: error: violación de contrato\nesperado: num\ndado: ~a"
+                  f (findf (lambda (x) (not (number? x))) args)))]
+      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-int) (if (andmap integer? args)
+                                                            #t
+                                                            (error 'interp "~a: error: violación de contrato\nesperado: entero\ndado: ~a"
+                                                                   f (findf (lambda (x) (not (integer? x))) args)))]
+      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-bool) (if (andmap boolean? args)
+                                                            #t
+                                                            (error 'interp "~a: error: violación de contrato\nesperado: bool\ndado: ~a"
+                                                                   f (findf (lambda (x) (not (boolean? x))) args)))]
+      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-str) (if (andmap string? args)
+                                                            #t
+                                                            (error 'interp "~a: error: violación de contrato\nesperado: str\ndado: ~a"
+                                                                   f (findf (lambda (x) (not (string? x))) args)))]
+      [else #f])))
+
+
+#|Función auxiliar de interp y subst que transforma una expresión WAE with* a expresiones
+  with anidadas. Se usa para simplificar los procedimiento sque involucran a with*.
+
+  with*->with: WAE -> WAE
+|#
 (define (with*->with expr)
   (let ([bindings (with*-assigns expr)]
         [body (with*-body expr)])
