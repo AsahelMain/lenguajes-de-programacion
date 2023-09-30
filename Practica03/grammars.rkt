@@ -19,7 +19,7 @@
 #| Ejercicio 2 |#
 #| Función que recibe n argumentos y aplica al operador lógico
    and sobre todos los argumentos.
-   any any ... any -> boolean
+   anD: any any ... any -> boolean
 |#
 (define (anD . args)
   (foldl (lambda (a b) (and a b)) #t args))
@@ -27,7 +27,7 @@
 #| Ejercicio 2 |#
 #| Función que recibe n argumentos y aplica al operador lógico
    or sobre todos los argumentos.
-   any any ... any -> boolean
+   oR: any any ... any -> boolean
 |#
 (define (oR . args)
   (foldl (lambda (a b) (or a b)) #f args))
