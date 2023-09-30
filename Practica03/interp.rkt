@@ -12,7 +12,7 @@
              [id (i) (error 'interp "Variable libre: '~a" i)]
              [num (n) n]
              [bool (b) b]
-             [str (s) s]
+             [strinG (s) s]
              [op (f args)
                  (let ([args-interpretados (map interp args)])                   
                    ;; Se revisa que los tipos de los argumentos dados sean validos.
@@ -37,11 +37,10 @@
   verifica-argumentos: procedure (listof any) -> boolean
 |#
 (define (verifica-argumentos f args)
-  (let ([ops-con-num '(+ - / * min max expt sqrt sub1 add1 < > <= >= = number? zero?)]
+  (let ([ops-con-num '(+ - / * min max expt sqrt sub1 add1 < > <= >= = zero?)]
         [ops-con-int '(modulo )]
-        [ops-con-bool '(not anD oR bool?)]
+        [ops-con-bool '(not anD oR)]
         [ops-con-str '(string-length string?)])
-    (ormap (lambda (x) (eq? (eval x) f)) ops-con-num)
     (cond 
       [(ormap (lambda (x) (eq? (eval x) f)) ops-con-num)
        (if (andmap number? args)
@@ -60,7 +59,7 @@
                                                             #t
                                                             (error 'interp "~a: error: violación de contrato\nesperado: str\ndado: ~a"
                                                                    f (findf (lambda (x) (not (string? x))) args)))]
-      [else #f])))
+      [else #t])))
 
 
 #|Función auxiliar de interp y subst que transforma una expresión WAE with* a expresiones
@@ -89,7 +88,7 @@
         [num (n) expr]
         [id (i) (if (symbol=? i sub-id) value expr)]
         [bool (b) expr]
-        [str (s) expr]
+        [strinG (s) expr]
         [op (f args) (op f (map (lambda (expr) (subst sub-id value expr)) args))]
         [with (assigns body)
               (cond

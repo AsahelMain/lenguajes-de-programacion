@@ -10,7 +10,7 @@
   [num (n number?)]
   [id (i symbol?)]
   [bool (b boolean?)]
-  [str (s string?)]
+  [strinG (s string?)]
   ;; Acepta cualquier procedimiento como operación.
   [op (f procedure?) (args (listof WAE?))]
   [with (assigns (listof Binding?)) (body WAE?)]

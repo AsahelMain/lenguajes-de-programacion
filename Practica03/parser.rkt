@@ -11,7 +11,7 @@ parse: WAE -> ASA|#
     [(number? s-exp) (num s-exp)]
     [(symbol? s-exp) (id s-exp)]
     [(boolean? s-exp) (bool s-exp)]
-    [(string? s-exp) (str s-exp)]
+    [(string? s-exp) (strinG s-exp)]
     [(list? s-exp)
      (let [(head (car s-exp))]
        (case head
