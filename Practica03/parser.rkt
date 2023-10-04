@@ -15,12 +15,20 @@ parse: WAE -> ASA|#
     [(list? s-exp)
      (let [(head (car s-exp))]
        (case head
-         [(sub1 add1 not zero? num? str? bool? str-length sqrt) (if (= (length (cdr s-exp)) 1) (op (eval (translate head)) (map parse(cdr s-exp))) (error 'parse (string-append "La operación " (symbol->string head) " debe ser ejecutada con 1 argumentos.")))]
-         [(modulo expt) (if (= (length (cdr s-exp)) 2) (op (eval head) (map parse(cdr s-exp))) (error 'parse (string-append "La operación " (symbol->string head) " debe de ser ejecutada con 2 argumentos.")))]
-         [(+ - * / min max = < > <= >= and or) (if (> (length (cdr s-exp)) 0) (op (eval (translate head)) (map parse(cdr s-exp))) (error 'parse (string-append "La operación " (symbol->string head) " debe ser ejecutada con mas de 0 argumentos." )))]
+         [(sub1 add1 not zero? num? str? bool? str-length sqrt)
+          (if (= (length (cdr s-exp)) 1)
+              (op (translate head) (map parse(cdr s-exp)))
+              (error 'parse (string-append "La operación " (symbol->string head) " debe ser ejecutada con 1 argumentos.")))]
+         [(modulo expt)
+          (if (= (length (cdr s-exp)) 2)
+              (op (translate head) (map parse(cdr s-exp)))
+              (error 'parse (string-append "La operación " (symbol->string head) " debe de ser ejecutada con 2 argumentos.")))]
+         [(+ - * / min max = < > <= >= and or)
+          (if (> (length (cdr s-exp)) 0)
+              (op (translate head) (map parse(cdr s-exp)))
+              (error 'parse (string-append "La operación " (symbol->string head) " debe ser ejecutada con mas de 0 argumentos." )))]
          [(with) (with (bindingList (second s-exp) '()) (parse (third s-exp)))]
-         [(with*) (with* (map list-to-binding (second s-exp)) (parse (third s-exp)))]
-))]))
+         [(with*) (with* (map list-to-binding (second s-exp)) (parse (third s-exp)))]))]))
 #| Función encargada de verificar que no haya
 identificadores repetidos dentro la lista de
 asignaciones para poder parsearla
@@ -39,14 +47,31 @@ bindingList: list list -> ASA|#
 translate: procedure -> procedure|#
 (define (translate op)
   (case op
-    [(str-length) string-length]
+    [(+) +]
+    [(-) -]
+    [(-) -]
+    [(/) /]
+    [(*) *]
+    [(modulo) modulo]
+    [(min) min]
+    [(max) max]
+    [(expt) expt]
+    [(sqrt) sqrt]
+    [(sub1) sub1]
+    [(add1) add1]
+    [(<) <]
+    [(>) >]
+    [(<=) <=]
+    [(>=) >=]
+    [(=) =]
+    [(not) not]
+    [(and) anD]
+    [(or) oR]
+    [(zero?) zero?]
     [(num?) number?]
     [(str?) string?]
     [(bool?) boolean?]
-    [(and) anD]
-    [(or) oR]
-    [else op]
-    ))
+    [(str-length) string-length]))
 
 #| Función encargada de parsear una lista de
  asignacion (Binding)

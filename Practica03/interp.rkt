@@ -1,5 +1,4 @@
 #lang plai
-
 (require "grammars.rkt")
 (require "parser.rkt")
 
@@ -21,7 +20,9 @@
                    ;; Se decidió manejar los errores de esta forma debido a que
                    ;; Racket lo hace de una forma similar.
                    (when (verifica-argumentos f args-interpretados)
-                       (apply f args-interpretados)))]
+                     (apply f args-interpretados)
+                     ))
+                 ]
              [with (assigns body)
                    ;; Se sustituye cada id en el cuerpo y se interpreta.
                    (interp (foldl (lambda (binding acc)
@@ -29,7 +30,8 @@
                                   body
                                   assigns))]
              ;; Se interpreta la expresión transformada a withs anidados.
-             [with* (assigns body) (interp (with*->with expr))]))
+             [with* (assigns body) (interp (with*->with expr))])
+  )
 
 #|Función auxiliar de interp que verifica que los argumentos dados a
   un procedimiento sean válidos, en caso de no serlos muestra un error.
@@ -42,24 +44,25 @@
         [ops-con-bool '(not anD oR)]
         [ops-con-str '(string-length string?)])
     (cond 
-      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-num)
+      [(ormap (lambda (x) (eq? (translate x) f)) ops-con-num)
        (if (andmap number? args)
            #t
            (error 'interp "~a: error: violación de contrato\nesperado: num\ndado: ~a"
                   f (findf (lambda (x) (not (number? x))) args)))]
-      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-int) (if (andmap integer? args)
-                                                            #t
-                                                            (error 'interp "~a: error: violación de contrato\nesperado: entero\ndado: ~a"
+      [(ormap (lambda (x) (eq? (translate x) f)) ops-con-int) (if (andmap integer? args)
+                                                             #t
+                                                             (error 'interp "~a: error: violación de contrato\nesperado: entero\ndado: ~a"
                                                                    f (findf (lambda (x) (not (integer? x))) args)))]
-      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-bool) (if (andmap boolean? args)
-                                                            #t
-                                                            (error 'interp "~a: error: violación de contrato\nesperado: bool\ndado: ~a"
+      [(ormap (lambda (x) (eq? (translate x) f)) ops-con-bool) (if (andmap boolean? args)
+                                                              #t
+                                                              (error 'interp "~a: error: violación de contrato\nesperado: bool\ndado: ~a"
                                                                    f (findf (lambda (x) (not (boolean? x))) args)))]
-      [(ormap (lambda (x) (eq? (eval x) f)) ops-con-str) (if (andmap string? args)
-                                                            #t
-                                                            (error 'interp "~a: error: violación de contrato\nesperado: str\ndado: ~a"
+      [(ormap (lambda (x) (eq? (translate x) f)) ops-con-str) (if (andmap string? args)
+                                                             #t
+                                                             (error 'interp "~a: error: violación de contrato\nesperado: str\ndado: ~a"
                                                                    f (findf (lambda (x) (not (string? x))) args)))]
       [else #t])))
+
 
 
 #|Función auxiliar de interp y subst que transforma una expresión WAE with* a expresiones
