@@ -1,19 +1,64 @@
 #lang plai
-
+#| Ejercicio 4 |#
 (require "grammars.rkt")
 
-;; parse :: s-exp -> CFWSBAE
-(define (parse s-exp) (error '0))
+#| Función que recibe una expresión CFWSBAE y la parsea
+realizando su ASA
 
+;; parse :: s-exp -> CFWSBAE|#
+(define (parse s-exp)
+  (cond
+    [(number? s-exp) (numS s-exp)]
+    [(symbol? s-exp) (idS s-exp)]
+    [(boolean? s-exp) (boolS s-exp)]
+    [(string? s-exp) (strinGS s-exp)]
+    [(list? s-exp)
+     #|(if (length (cdr s-exp)) () )|#
+     (let [(head (car s-exp))]
+       (case head
+         [(sub1 add1 not zero? num? str? bool? str-length sqrt)
+          (if (= (length (cdr s-exp)) 1)
+              (opS (translate head) (map parse(cdr s-exp)))
+              (error 'parse (string-append "La operación " (symbol->string head) " debe ser ejecutada con 1 argumentos.")))]
+         [(modulo expt)
+          (if (= (length (cdr s-exp)) 2)
+              (opS (translate head) (map parse(cdr s-exp)))
+              (error 'parse (string-append "La operación " (symbol->string head) " debe de ser ejecutada con 2 argumentos.")))]
+         [(+ - * / min max = < > <= >= and or)
+          (if (> (length (cdr s-exp)) 0)
+              (opS (translate head) (map parse(cdr s-exp)))
+              (error 'parse (string-append "La operación " (symbol->string head) " debe ser ejecutada con mas de 0 argumentos." )))]
+         [(with) (withS (bindingList (second s-exp) '()) (parse (third s-exp)))]
+         [(with*) (with*S (map list-to-binding (second s-exp)) (parse (third s-exp)))]
+         [(fun) (funS (id-list (second s-exp) '()) (parse (third s-exp)))]
+         [(if) (case (length (cdr s-exp))
+                  [(0) (error 'parse "parse: Falta la if-condition.")]
+                  [(1) (error 'parse "parse: Falta then-expression.")]
+                  [(2) (error 'parse "parse: Falta la else-expression.")]
+                  [else (iFS (parse (second s-exp)) (parse (third s-exp)) (parse (fourth s-exp)) )])]
+         #|[(cond)]|#
+         ))]))
+#| Función encargada de verificar que no haya
+identificadores repetidos dentro la lista de
+asignaciones para poder parsearla
 
+bindingList: list list -> ASA|#
+(define (bindingList ls acc)
+  (if (empty? ls)
+      empty
+      (let([head (first ls)])
+        (if (member (car head) acc)
+            (error 'parse (string-append "El identificador " (symbol->string (car head)) " está declarado más de una vez."))
+            (cons (list-to-binding head) (bindingList (cdr ls) (cons (car head) acc)))))))
 
-(define (anD . args)
-  (foldl (lambda (a b) (and a b)) #t args))
-
-(define (oR . args)
-  (foldl (lambda (a b) (or a b)) #f args))
-
-
+(define (id-list ls acc)
+  (if (empty? ls)
+      (reverse acc)
+      (if (member (first ls) (cdr ls))
+          (error 'parse (string-append "parse: Parámetro " (symbol->string (first ls)) " está declarado dos veces."))
+          (id-list (cdr ls) (cons (first ls) acc))
+          ))
+    )
 #| Traduce los operadores implementados por su equivalente en Racket
 
 translate: procedure -> procedure|#
@@ -44,3 +89,18 @@ translate: procedure -> procedure|#
     [(str?) string?]
     [(bool?) boolean?]
     [(str-length) string-length]))
+
+#| Función encargada de parsear una lista de
+ asignacion (Binding)
+
+list-to-binding: list -> ASA|#
+(define (list-to-binding ls)
+  (case (length ls)
+    [(2) (binding (first ls) (parse (second ls)))]
+    [else error 'parse "Estructura incorrecta de Binding."]
+  ))
+(define (anD . args)
+  (foldl (lambda (a b) (and a b)) #t args))
+
+(define (oR . args)
+  (foldl (lambda (a b) (or a b)) #f args))
