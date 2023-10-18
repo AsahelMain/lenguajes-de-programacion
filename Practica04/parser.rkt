@@ -52,7 +52,7 @@ bindingList: list list -> ASA|#
 
 (define (id-list ls acc)
   (if (empty? ls)
-      (map parse (reverse acc))
+      (reverse acc)
       (if (member (first ls) (cdr ls))
           (error 'parse (string-append "parse: Parámetro " (symbol->string (first ls)) " está declarado dos veces."))
           (id-list (cdr ls) (cons (first ls) acc))
