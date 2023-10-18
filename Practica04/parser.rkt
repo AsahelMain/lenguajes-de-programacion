@@ -13,7 +13,6 @@ realizando su ASA
     [(boolean? s-exp) (boolS s-exp)]
     [(string? s-exp) (strinGS s-exp)]
     [(list? s-exp)
-     #|(if (length (cdr s-exp)) () )|#
      (let [(head (car s-exp))]
        (case head
          [(sub1 add1 not zero? num? str? bool? str-length sqrt)
@@ -36,7 +35,7 @@ realizando su ASA
                   [(1) (error 'parse "parse: Falta then-expression.")]
                   [(2) (error 'parse "parse: Falta la else-expression.")]
                   [else (iFS (parse (second s-exp)) (parse (third s-exp)) (parse (fourth s-exp)) )])]
-         #|[(cond)]|#
+         #|[(cond) (if (<= (length (cdr s-exp)) 1) (error 'parse "parse: La expresión conds debe contar con 1 o mas condiciones y una expresión else.") (map parse (cdr s-exp)))]|#
          ))]))
 #| Función encargada de verificar que no haya
 identificadores repetidos dentro la lista de
@@ -53,7 +52,7 @@ bindingList: list list -> ASA|#
 
 (define (id-list ls acc)
   (if (empty? ls)
-      (reverse acc)
+      (map parse (reverse acc))
       (if (member (first ls) (cdr ls))
           (error 'parse (string-append "parse: Parámetro " (symbol->string (first ls)) " está declarado dos veces."))
           (id-list (cdr ls) (cons (first ls) acc))
