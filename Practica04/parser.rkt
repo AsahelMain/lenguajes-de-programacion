@@ -39,6 +39,7 @@ realizando su ASA
                      (let [(elSE (last s-exp))]
                      (conDS (map list-to-condition (take (cdr s-exp) (sub1 (length (cdr s-exp)))))
                             (parse (second elSE)))))]
+         [else (appS (parse head) (map parse (cdr s-exp)))]
          ))]))
 #| Función encargada de verificar que no haya
 identificadores repetidos dentro la lista de
@@ -53,6 +54,10 @@ bindingList: list list -> ASA|#
             (error 'parse (string-append "El identificador " (symbol->string (car head)) " está declarado más de una vez."))
             (cons (list-to-binding head) (bindingList (cdr ls) (cons (car head) acc)))))))
 
+#| Función encargada de verificar que no haya
+identificadores repetidos dentro la lista de
+simbolos
+id-list: list list -> list|#
 (define (id-list ls acc)
   (if (empty? ls)
       (reverse acc)
@@ -61,7 +66,9 @@ bindingList: list list -> ASA|#
           (id-list (cdr ls) (cons (first ls) acc))
           ))
   )
-
+#| Función envargada de parsear correctamente una Condition
+list-to-condition: list -> condition
+|#
 (define (list-to-condition ls)
   (case (length ls)
     [(2) (condition (parse (first ls)) (parse (second ls)))]
