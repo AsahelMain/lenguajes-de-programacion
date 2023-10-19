@@ -62,7 +62,7 @@ id-list: list list -> list|#
   (if (empty? ls)
       (reverse acc)
       (if (member (first ls) (cdr ls))
-          (error 'parse (string-append "parse: Parámetro " (symbol->string (first ls)) " está declarado dos veces."))
+          (error 'parse (string-append "Parámetro '" (symbol->string (first ls)) " definido dos veces."))
           (id-list (cdr ls) (cons (first ls) acc))
           ))
   )
