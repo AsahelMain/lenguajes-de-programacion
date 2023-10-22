@@ -14,7 +14,11 @@
   [mt-env]
   [cons-env (id symbol?) (value CFSBAE-Val?) (rest-env Env?)])
 
-;; interp :: CFSBAE x Env -> CFSBAE-Val
+
+#|Ejercicio 4
+  Función que recibe una expresión CFSBAE y la interpreta
+  interp :: CFSBAE x Env -> CFSBAE-Val
+|#
 (define (interp expr env)
   (type-case CFSBAE expr
     [num (n) (num-v n)]
@@ -22,6 +26,7 @@
     [bool (b) (bool-v b)]
     [strinG (s) (string-v s)]   
     [op (f args) (let* ([args-interpretados (map (lambda(x)(interp x env)) args)]
+                        ;; Se convierten los argumentos de CFSBAE-Val a valores de Racket
                         [args-convertidos (map (lambda (x) (CFSBAE-Val->RacketValue x)) args-interpretados)])                   
                    ;; Se revisa que los tipos de los argumentos dados sean validos.
                    ;; En caso de no serlo se imprime el procedimiento con el tipo de argumento
@@ -30,12 +35,18 @@
                    ;; Racket lo hace de una forma similar.
                    (when (verifica-argumentos f args-convertidos)
                      (let ([resultado (apply f args-convertidos)])
+                         ;; Se convierten los valores de Racket a valores de tipo CFSBAE-val
                          (RacketValue->CFSBAE-Val resultado))))
                        ]
     [fun (params body) (closure-v params body env)]
     [app (f args) (let* ([fu (interp f env)]
+                         ;; Se interpretan los argumentos de la función con el entorno actual
                          [arg-val (map (lambda (x) (interp x env)) args)]
+                         ;; Se crea un nuevo entorno con los argumentos del closure de función,
+                         ;; los argumentos interpretados y el entorno del closure de función
                          [ext-env (extend-env (closure-v-args fu) arg-val (closure-v-env fu))])
+                    ;; Se interpreta el cuerpo del closure de la función con el entorno extendido
+                    ;; De esta forma se logra el alcance estático en el lenguaje
                     (interp (closure-v-body fu) ext-env))]
     [iF (test-expr then-expr else-expr) (let ([test-val (interp test-expr env)])
                                           (if (bool-v? test-val)
@@ -44,8 +55,11 @@
                                                   (interp else-expr env))
                                               (error 'interp "La condición de una expresión if debe ser un booleano.")))]))
     
-
-;; lookup :: symbol x Env -> CFSBAE-Val
+#|Función auxiliar de interp
+  Busca un símbolo en el entorno y devuelve su valor asociado.
+  Si no lo encuentra regresa un error.
+  lookup :: symbol x Env -> CFSBAE-Val
+|#
 (define (lookup sub-id env)
   (type-case Env env
     [mt-env () (error 'interp (format "Variable libre ~a" sub-id))]
@@ -54,7 +68,13 @@
              value
              (lookup sub-id rest-env))]))
 
-;; extend-env :: listof symbol x listof CFSBAE -> Env
+#| Función auxiliar de interp
+   Recibe una lista de símbolos, una lista de valores CFSBAE
+   y un entorno. Construye un entorno con parejas de símbolos
+   y valores CFSBAE sobre el entorno que se pasa como parámetro
+   ;; extend-env :: listof symbol x listof CFSBAE x Env -> Env
+|#
+
 (define (extend-env params args env)
   (if (not(= (length params) (length args)))
       (error'interp "Numero de argumentos y parametros distinto")
@@ -94,7 +114,9 @@
       [else #t])))
 
 
-;; CFSBAE-Val->RacketValue :: CFSBAE-Val -> number | boolean | string
+#|Función que convierte valores CFSBAE-Val a valores de Racket
+  CFSBAE-Val->RacketValue :: CFSBAE-Val -> number | boolean | string
+|#
 (define (CFSBAE-Val->RacketValue val)
   (match val
     [(num-v n) n]
@@ -102,8 +124,10 @@
     [(string-v s) s]
     [_ "~val: error: no es un valor valido"]))
 
+#|Función que convierte valores de Racket a valores de tipo CFSBAE-Val
+  RacketValue->CFSBAE-Val :: number | boolean | string -> CFSBAE-Val
+|#
 
-;; RacketValue->CFSBAE-Val :: number | boolean | string -> CFSBAE-Val
 (define (RacketValue->CFSBAE-Val val)
   (cond
     [(number? val) (num-v val)]
@@ -111,8 +135,3 @@
     [(string? val) (string-v val)]
     [else "~val: error: no es un valor valido"]))
     
-
-;(require racket/trace)
-;(trace interp)
-;(trace lookup)
-;(trace extend-env)
