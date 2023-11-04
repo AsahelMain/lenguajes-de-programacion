@@ -21,14 +21,4 @@
 (define (interp expr env) (error 'interp "Sin implementar"))
 
 ;; symbol x Env -> RCFSBAE-Val
-(define (lookup sub-id env)
-  (type-case Env env
-    [mt-env () (error 'interp (format "Variable libre ~a" sub-id))]
-    [cons-env (id value rest-env)
-         (if (symbol=? sub-id id)
-             value
-             (lookup sub-id rest-env))]
-    [rec-cons-env (id value rest-env)
-          (if (symbol=? sub-id id)
-              (unbox value)
-              (lookup sub-id rest-env))]))
+(define (lookup sub-id env) (error 'lookup "Sin implementar"))
