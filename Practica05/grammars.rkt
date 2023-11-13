@@ -1,3 +1,7 @@
+#|@author{Arturo González Peñaloza 319091193}
+@author{Asahel Said Main Cerezo 319260658}
+@author{Emilio Arsenio Raudry Rico 318289276}
+|#
 #lang plai
 
 (define-type Binding
