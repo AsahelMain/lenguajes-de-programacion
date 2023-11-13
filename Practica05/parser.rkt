@@ -2,7 +2,10 @@
 
 (require "grammars.rkt")
 
-;; s-expr -> RCFSBAE
+#| Función que recibe una expresión RCFSBAE y la parsea
+realizando su ASA
+
+;; s-expr -> RCFSBAE |#
 (define (parse s-exp)
   (cond
     [(number? s-exp) (num s-exp)]
@@ -78,6 +81,10 @@ translate: procedure -> procedure|#
     [(bool?) boolean?]
     [(str-length) string-length]))
 
+#| Función encargada de parsear una lista de
+ asignacion (Binding)
+
+list-to-binding: list -> ASA|#
 (define (list-to-binding ls)
   (case (length ls)
     [(2) (binding (first ls) (parse (second ls)))]
@@ -97,8 +104,12 @@ id-list: list list -> list|#
           ))
   )
 
+#| Implementación propia de and
+anD: args->bool|#
 (define (anD . args)
   (foldl (lambda (a b) (and a b)) #t args))
 
+#| Implementación propia de or
+oR: args->bool|#
 (define (oR . args)
   (foldl (lambda (a b) (or a b)) #f args))
