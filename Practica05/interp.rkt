@@ -147,7 +147,11 @@ y valores CFSBAE sobre el entorno que se pasa como parámetro
           (cons-env (first params) (first args) (extend-env (cdr params) (cdr args) env)))))
 
 
-;; symbol x Env -> RCFSBAE-Val
+#| Función auxiliar de interp
+   Busca un símbolo en un entorno y devuelve su valor asociado.
+   Si no lo encuentra, regresa un error.
+;; lookup :: symbol x Env -> RCFSBAE-Val
+|#
 (define (lookup sub-id env)
   (type-case Env env
     [mt-env () (error 'interp (format "Variable libre ~a" sub-id))]
@@ -155,6 +159,7 @@ y valores CFSBAE sobre el entorno que se pasa como parámetro
          (if (symbol=? sub-id id)
              value
              (lookup sub-id rest-env))]
+    ;; si el ambiente es recursivo se realiza la operación unbox
     [rec-cons-env (id value rest-env)
           (if (symbol=? sub-id id)
               (unbox value)
