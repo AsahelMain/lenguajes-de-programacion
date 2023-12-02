@@ -145,10 +145,15 @@ translate: procedure -> procedure|#
     [(num?) number?]
     [(str?) string?]
     [(bool?) boolean?]
-    [(str-length) string-length]))
+    [(str-length) string-length]
+    [else op]))
 
+#| Implementación propia de and
+anD: args->bool|#
 (define (anD . args)
   (foldl (lambda (a b) (and a b)) #t args))
 
+#| Implementación propia de or
+oR: args->bool|#
 (define (oR . args)
   (foldl (lambda (a b) (or a b)) #f args))
