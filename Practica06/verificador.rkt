@@ -32,15 +32,24 @@ Función encargada de evaluar los tipos de une expresion
                               [param-distinto (first (filter (lambda (x) (equal? tipo-distinto (typeof x ctx))) args))])
                          (error 'typeof "Error en el parametro ~v. Tipo esperado: ~v. Tipo dado: ~v" param-distinto tipo-esperado tipo-distinto))))]
              [fun (params return-type body)
-                (funT (append (map param-type params) (list return-type)))]
+                (let ([extended-ctx (foldl (lambda (x acc) (gamma (param-id x) (param-type x) acc))
+                                           ctx
+                                           params)])
+                  (if (equal? (typeof body extended-ctx) return-type)
+                      (funT (append (map param-type params) (list return-type)))
+                      (error "errro")))]
              [app (f params)
                   (let* ([f-types (funT-params (typeof f ctx))]
                          [expected-types (take f-types (sub1 (length f-types)))]
                          [return-type (last f-types)]
                          [params-types (map (lambda (x) (typeof x ctx)) params)])
                     (if (not (equal? expected-types params-types))
-                        (error 'typeof "El tipo de los parámetros no es el esperado." )
-                        return-type))]
+                        (let* ([tipo-distinto (ormap (lambda (elem1 elem2) (not (= elem1 elem2)))
+                                                     (map list expected-types params-types))]
+                               [param-distinto (first (filter (lambda (x) (equal? tipo-distinto (typeof x ctx))) params))])
+                          (error 'typeof "Error en el parametro ~v. Tipo esperado: ~v. Tipo dado: ~v" param-distinto return-type tipo-distinto))
+                        return-type
+                        ))]
              [with* (assigns body) (typeof (with*->with expr) ctx)]
              [else "TODO"]))
 #|
@@ -65,11 +74,11 @@ conD->iF: TCFWSBAE -> TCFWSBAE
             (condition-then-expr (first conditions))
             (conD->iF (conD (rest conditions) else-expr))))))
 
-(define (with->app w)
+(define (with->app w ctx)
   (let ([bindings (with-bindings w)]
         [body (with-body w)])
     (app (fun (map (lambda (x) (param (binding-id x) (binding-type x))) bindings)
-            ))))
+            (typeof body ctx)))))
 #|Función auxiliar de type transforma una expresión TCFWSBAE with* a expresiones
 with anidadas. Se usa para simplificar los procedimientos que involucran a with*.
 
