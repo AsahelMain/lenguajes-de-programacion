@@ -2,9 +2,16 @@
 
 (require "grammars.rkt")
 (require "parser.rkt")
+<<<<<<< HEAD
 #|
 Función encargada de evaluar los tipos de une expresion
 |#
+=======
+
+;; Ejercicio 2.
+;; Función que se encarga de realizar la verificación de tipos de una expresión
+;; y regresa el tipo del valor de retorno de la misma.
+>>>>>>> 3d6fc39 (Adds cases and documentation.)
 ;; TCFWSBAE x TypeContext -> Type
 (define (typeof expr ctx)
   (type-case TCFWSBAE expr
@@ -51,6 +58,7 @@ Función encargada de evaluar los tipos de une expresion
                         return-type
                         ))]
              [with* (assigns body) (typeof (with*->with expr) ctx)]
+<<<<<<< HEAD
              [else "TODO"]))
 #|
 Devuelve un parametro distinto de una lista al esperado
@@ -65,6 +73,25 @@ obtener-tipo-distinto-param
 
 conD->iF: TCFWSBAE -> TCFWSBAE
 |#
+=======
+             [with (assigns body)
+                   (if (andmap (lambda (x) (equal? (binding-type binding)
+                                              (typeof (binding-value binding)
+                                                      (ctx)))) assigns)
+                       (typeof body (foldl (lambda (x acc) (gamma (binding-id x) (binding-type x) acc))
+                                           ctx
+                                           assigns))
+                       (error 'typeof))]))
+
+;; Función auxiliar de typeof
+;; Obtiene el primer tipo distinto al esperado al realizar una operación
+;; Type x (list type) -> Type
+(define (obtener-tipo-distinto-param esperado lst)
+  (cond [(not (equal? (car lst) esperado)) (car lst)]
+        [else (obtener-tipo-distinto-param esperado (cdr lst))]))
+;; Función que transforma una expresión conD en iFs anidados.
+;; TCFWSBAE -> TCFWSBAE
+>>>>>>> 3d6fc39 (Adds cases and documentation.)
 (define (conD->iF expr)
   (let ([conditions (conD-conditions expr)]
         [else-expr (conD-else-expr expr)])
@@ -74,14 +101,8 @@ conD->iF: TCFWSBAE -> TCFWSBAE
             (condition-then-expr (first conditions))
             (conD->iF (conD (rest conditions) else-expr))))))
 
-(define (with->app w ctx)
-  (let ([bindings (with-bindings w)]
-        [body (with-body w)])
-    (app (fun (map (lambda (x) (param (binding-id x) (binding-type x))) bindings)
-            (typeof body ctx)))))
 #|Función auxiliar de type transforma una expresión TCFWSBAE with* a expresiones
 with anidadas. Se usa para simplificar los procedimientos que involucran a with*.
-
 with*->with: TCFWSBAE -> TCFWSBAE
 |#
 (define (with*->with expr)
@@ -105,10 +126,16 @@ lookup :: symbol x TypeContext -> Type
                         type
                         (lookup sub-id rest-context))]))
 
+<<<<<<< HEAD
 #|
 Devuelve el tipo de una operacion
 tipo-op : op -> Type
 |#
+=======
+;; Función auxiliar de type que indica el tipo de un procedimiento de racket de
+;; acuerdo a la gramática TCFWSBAE.
+;; procedure -> Type
+>>>>>>> 3d6fc39 (Adds cases and documentation.)
 (define (tipo-op op)
   (let ([ops-con-num '(+ - / * min max expt sqrt sub1 add1 < > <= >= = zero? modulo)]
         [ops-con-bool '(not and or)]
