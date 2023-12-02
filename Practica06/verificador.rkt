@@ -2,7 +2,9 @@
 
 (require "grammars.rkt")
 (require "parser.rkt")
-
+#|
+Función encargada de evaluar los tipos de une expresion
+|#
 ;; TCFWSBAE x TypeContext -> Type
 (define (typeof expr ctx)
   (type-case TCFWSBAE expr
@@ -41,11 +43,19 @@
                         return-type))]
              [with* (assigns body) (typeof (with*->with expr) ctx)]
              [else "TODO"]))
-
+#|
+Devuelve un parametro distinto de una lista al esperado
+obtener-tipo-distinto-param: Param  list -> Param 
+obtener-tipo-distinto-param 
+|#
   (define (obtener-tipo-distinto-param esperado lst)
     (cond [(not (equal? (car lst) esperado)) (car lst)]
           [else (obtener-tipo-distinto-param esperado (cdr lst))]))
-  
+
+#|Convierte una expresion de conD a una iF
+
+conD->iF: TCFWSBAE -> TCFWSBAE
+|#
 (define (conD->iF expr)
   (let ([conditions (conD-conditions expr)]
         [else-expr (conD-else-expr expr)])
@@ -118,6 +128,10 @@ oR: args->bool|#
     [(bool?) boolean?]
     [(str-length) string-length]))
 
+#|
+Devuelve el tipo de una operacion
+tipo-op : op -> Type
+|#
 (define (tipo-op op)
   (let ([ops-con-num '(+ - / * min max expt sqrt sub1 add1 < > <= >= = zero? modulo)]
         [ops-con-bool '(not and or)]
