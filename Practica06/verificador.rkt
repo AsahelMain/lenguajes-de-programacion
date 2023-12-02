@@ -3,9 +3,11 @@
 (require "grammars.rkt")
 (require "parser.rkt")
 
+(lookup 'y (gamma 'y (booleanT )(gamma 'x (numberT) (phi))))
 ;; TCFWSBAE x TypeContext -> Type
 (define (typeof expr ctx)
   (type-case TCFWSBAE expr
+             [id (i) (lookup i ctx)]
              [num (n) (numberT)]
              [bool (b) (booleanT)]
              [strinG (s) (stringT)]
@@ -20,7 +22,19 @@
                              tipo-else))))]
              [conD (conditions else-expr)
                    (typeof (conD->iF expr) ctx)]
+             [fun (params return-type body)
+                (funT (append (map param-type params) (list return-type)))]
+             [app (f params)
+                  (let* ([f-types (funT-params (typeof f ctx))]
+                         [expected-types (take f-types (sub1 (length f-types)))]
+                         [return-type (last f-types)]
+                         [params-types (map (lambda (x) (typeof x ctx)) params)])
+                    (if (not (equal? expected-types params-types))
+                        (error 'typeof "El tipo de los parámetros no es el esperado." )
+                        return-type)
+                    )]
              [else "TODO"]))
+
 
 (define (conD->iF expr)
   (let ([conditions (conD-conditions expr)]
@@ -30,3 +44,16 @@
         (iF (condition-test-expr (first conditions))
             (condition-then-expr (first conditions))
             (conD->iF (conD (rest conditions) else-expr))))))
+
+#|Función auxiliar de interp
+Busca un símbolo en el contexto y devuelve su tipo.
+Si no lo encuentra regresa un error.
+lookup :: symbol x TypeContext -> Type
+|#
+(define (lookup sub-id env)
+  (type-case TypeContext env
+             [phi () (error 'interp (format "Variable libre ~a" sub-id))]
+             [gamma (id type rest-context)
+                    (if (symbol=? sub-id id)
+                        type
+                        (lookup sub-id rest-context))]))
