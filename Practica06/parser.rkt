@@ -42,6 +42,10 @@ realizando su ASA
          [else (app (parse head) (map parse (cdr s-exp)))]
          ))]))
 
+#| Evalua aquellos tipos para cumplir las gramaticas de with, with* y fun
+parse-type : list -> Type
+|#
+
 (define (parse-type ty)
     (case ty
       [(num) (numberT)]
@@ -51,6 +55,10 @@ realizando su ASA
     )
 )
 
+#| Elimina de una lista todos los símbolos '->
+
+deleteArrow : list -> Type
+|#
 (define (deleteArrow ty) (if (equal? ty '->) #f #t))
 
 #| Función encargada de verificar que no haya
