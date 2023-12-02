@@ -65,6 +65,11 @@ conD->iF: TCFWSBAE -> TCFWSBAE
             (condition-then-expr (first conditions))
             (conD->iF (conD (rest conditions) else-expr))))))
 
+(define (with->app w)
+  (let ([bindings (with-bindings w)]
+        [body (with-body w)])
+    (app (fun (map (lambda (x) (param (binding-id x) (binding-type x))) bindings)
+            ))))
 #|Función auxiliar de type transforma una expresión TCFWSBAE with* a expresiones
 with anidadas. Se usa para simplificar los procedimientos que involucran a with*.
 
@@ -90,43 +95,6 @@ lookup :: symbol x TypeContext -> Type
                     (if (symbol=? sub-id id)
                         type
                         (lookup sub-id rest-context))]))
-#| Implementación propia de and
-anD: args->bool|#
-(define (anD . args)
-  (foldl (lambda (a b) (and a b)) #t args))
-
-#| Implementación propia de or
-oR: args->bool|#
-(define (oR . args)
-  (foldl (lambda (a b) (or a b)) #f args))
-
-(define (translate op)
-  (case op
-    [(+) +]
-    [(-) -]
-    [(-) -]
-    [(/) /]
-    [(*) *]
-    [(modulo) modulo]
-    [(min) min]
-    [(max) max]
-    [(expt) expt]
-    [(sqrt) sqrt]
-    [(sub1) sub1]
-    [(add1) add1]
-    [(<) <]
-    [(>) >]
-    [(<=) <=]
-    [(>=) >=]
-    [(=) =]
-    [(not) not]
-    [(and) anD]
-    [(or) oR]
-    [(zero?) zero?]
-    [(num?) number?]
-    [(str?) string?]
-    [(bool?) boolean?]
-    [(str-length) string-length]))
 
 #|
 Devuelve el tipo de una operacion
@@ -135,7 +103,7 @@ tipo-op : op -> Type
 (define (tipo-op op)
   (let ([ops-con-num '(+ - / * min max expt sqrt sub1 add1 < > <= >= = zero? modulo)]
         [ops-con-bool '(not and or)]
-        [ops-con-str '(string-length string?)])
+        [ops-con-str '(str-length string?)])
     (cond
       [(ormap (lambda (x) (eq? (translate x) op)) ops-con-num)
        (numberT)]
